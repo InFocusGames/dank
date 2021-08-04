@@ -38,6 +38,11 @@ impl HistoryBuffer {
     }
 
     #[inline]
+    pub async fn progress(&mut self) -> bool {
+        self.history.progress()
+    }
+
+    #[inline]
     pub fn push(&mut self, mut transaction: Transaction) -> TransactionId {
         if transaction.cycles == 0 {
             if let TransactionKind::CanisterCalled { .. } = transaction.kind {
@@ -70,6 +75,7 @@ impl HistoryBuffer {
 
 #[update]
 fn get_transaction(id: TransactionId) -> Option<&'static Transaction> {
+    crate::progress().await;
     storage::get::<HistoryBuffer>().history.get_transaction(id)
 }
 
